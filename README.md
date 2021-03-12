@@ -1,5 +1,7 @@
 # Serial Port to MQTT Bridge
 
+## Can't run this on docker due to Serial Port forwarding limitations on docker.
+
 ### 1. [__bridge.py__](./bridge.py) 
 Contains python program to bridge Serial Port and MQTT Server.
 - Data received on serial port will be published to topics based on data type.
