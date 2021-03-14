@@ -41,15 +41,20 @@ def on_message(client, userdata, msg):
     #     print("Received Message:\nTopic: {}\nMessage: {}".format(topic, message))
     telemetryMapping = {
         "ON":True,
-        "OFF":False
+        "OFF":False,
+        "container":"CX",
+        "SP1":"SP1X",
+        "SP2":"SP2X"
     }
     if topic == SUBSCRIBE_TOPIC:
         if DEBUG_MODE:
             print("Writing to Serial Port:\nTopic: {}\nMessage {}".format(topic, message))
         serialHandler.writePort(message)
     elif topic == TELEMETRY_ACTIVE_TOPIC:
-        START_TELEMETRY = telemetryMapping.get(message)
-        command = "CMD,2176,CX,{}".format(message)
+        status = message.split()
+
+        START_TELEMETRY = telemetryMapping.get(status[1])
+        command = "CMD,2176,{},{}".format(telemetryMapping.get(status[0]),status[1])
         serialHandler.writePort(command)
         if DEBUG_MODE:
             print("Writing Command: {}".format(command))
@@ -90,10 +95,10 @@ while True:
         # Read the serial port for available data
         # Execution will stop for as long as there's no return character i.e. "\n"
         # print("Got Serial Data: {}".format(readData), end="")
-        if START_TELEMETRY:
-            readData = serialHandler.readPort()
-            print(readData)
-            if "2176" in readData:
-                publish(readData)
+        # if START_TELEMETRY:
+        readData = serialHandler.readPort()
+        print(readData)
+        if "2176" in readData:
+            publish(readData)
     except:
         print("Error Occured..! Retrying..!")
