@@ -71,6 +71,10 @@ void loop()
     if (PACKET_COUNT == 20)
     {
       SOFTWARE_STATE = "DESCENT";
+      SP1_RELEASED = 'R';
+    }
+    if (PACKET_COUNT == 25){
+      SP2_RELEASED = 'R';
     }
 
     if (Serial.available())
