@@ -1,6 +1,6 @@
 #include <Arduino.h>
 bool VALUE = true;
-String TEAM_ID = "1267";
+String TEAM_ID = "2176";
 int MISSION_TIME = 0;
 int PACKET_COUNT = 0;
 String PACKET_TYPE = "C"; // C, S1 or S2
@@ -34,6 +34,7 @@ const long interval = 1000;
 void sendContainerTelemetry();
 void sendPayload1Telemetry();
 void sendPayload2Telemetry();
+void demo();
 
 void setup()
 {
@@ -52,35 +53,13 @@ void loop()
     // save the last time the code ran
     previousMillis = currentMillis;
 
+    demo();
     // Send Container Telemetry
     sendContainerTelemetry();
     // Send Payload 1 Telemetry
     sendPayload1Telemetry();
     // Send Payload 2 Telemetry
     sendPayload2Telemetry();
-
-    SP1_PACKET_COUNT++;
-    SP2_PACKET_COUNT++;
-    PACKET_COUNT++;
-    MISSION_TIME = millis() / 1000;
-    if (PACKET_COUNT == 5)
-    {
-      SOFTWARE_STATE = "ASCENT";
-    }
-
-    if (PACKET_COUNT == 20)
-    {
-      SOFTWARE_STATE = "DESCENT";
-      SP1_RELEASED = 'R';
-    }
-    if (PACKET_COUNT == 25){
-      SP2_RELEASED = 'R';
-    }
-
-    if (Serial.available())
-    {
-      Serial.println("Message Received " + Serial.readString());
-    }
   }
 }
 
@@ -108,4 +87,46 @@ void sendPayload2Telemetry()
       MISSION_TIME + "," + PACKET_COUNT +
       "," + "S2" + "," + SP_ALTITUDE +
       "," + SP_TEMP + "," + SP_ROTATION_RATE);
+}
+
+void demo()
+{
+  SP1_PACKET_COUNT++;
+  SP2_PACKET_COUNT++;
+  PACKET_COUNT++;
+  MISSION_TIME = millis() / 1000;
+  ALTITUDE = random(1000);
+  TEMP = random(30);
+  VOLTAGE = float(random(300, 500))/100;
+  GPS_LATITUDE = random(73, 74);
+  GPS_LONGITUDE = random(12, 13);
+  GPS_ALTITUDE = random(1000);
+  GPS_SATS = random(1, 7);
+  SP_ALTITUDE = random(1000);
+  SP_TEMP = random(28, 30);
+  SP_ROTATION_RATE = random(50, 80);
+  
+  switch (PACKET_COUNT)
+  {
+  case 5:
+    SOFTWARE_STATE = "ASCENT";
+    break;
+
+  case 20:
+    SOFTWARE_STATE = "DESCENT";
+    SP1_RELEASED = 'R';
+    break;
+
+  case 25:
+    SP2_RELEASED = 'R';
+    break;
+
+  default:
+    break;
+  }
+
+  if (Serial.available())
+  {
+    Serial.println("Message Received " + Serial.readString());
+  }
 }
