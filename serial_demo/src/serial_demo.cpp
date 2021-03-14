@@ -31,10 +31,15 @@ int SP_ROTATION_RATE = 80;
 unsigned long previousMillis = 0;
 const long interval = 1000;
 
+bool CONTAINER_TELEMETRY = false;
+bool SP1_TELEMETRY = false;
+bool SP2_TELEMETRY = false;
+
 void sendContainerTelemetry();
 void sendPayload1Telemetry();
 void sendPayload2Telemetry();
 void demo();
+void timer();
 
 void setup()
 {
@@ -47,6 +52,30 @@ void setup()
 
 void loop()
 {
+  if (Serial.available())
+  {
+    String command = Serial.readString().substring(9);
+    if (command == "CX,ON")
+    {
+      CONTAINER_TELEMETRY = true;
+    }
+    else if (command == "CX,OFF")
+    {
+      CONTAINER_TELEMETRY = false;
+    }
+    else if (command.substring(0,2) == "ST")
+    {
+      Serial.println("Setting Time");
+    }
+    else
+    {
+      Serial.println("Not a Command");
+    }
+  }
+  timer();
+}
+void timer()
+{
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval)
   {
@@ -55,11 +84,20 @@ void loop()
 
     demo();
     // Send Container Telemetry
-    sendContainerTelemetry();
+    if (CONTAINER_TELEMETRY)
+    {
+      sendContainerTelemetry();
+    }
     // Send Payload 1 Telemetry
-    sendPayload1Telemetry();
+    if (SP1_TELEMETRY)
+    {
+      sendPayload1Telemetry();
+    }
     // Send Payload 2 Telemetry
-    sendPayload2Telemetry();
+    if (SP2_TELEMETRY)
+    {
+      sendPayload2Telemetry();
+    }
   }
 }
 
@@ -97,7 +135,7 @@ void demo()
   MISSION_TIME = millis() / 1000;
   ALTITUDE = random(1000);
   TEMP = random(30);
-  VOLTAGE = float(random(300, 500))/100;
+  VOLTAGE = float(random(300, 500)) / 100;
   GPS_LATITUDE = random(73, 74);
   GPS_LONGITUDE = random(12, 13);
   GPS_ALTITUDE = random(1000);
@@ -105,7 +143,7 @@ void demo()
   SP_ALTITUDE = random(1000);
   SP_TEMP = random(28, 30);
   SP_ROTATION_RATE = random(50, 80);
-  
+
   switch (PACKET_COUNT)
   {
   case 5:
@@ -123,10 +161,5 @@ void demo()
 
   default:
     break;
-  }
-
-  if (Serial.available())
-  {
-    Serial.println("Message Received " + Serial.readString());
   }
 }

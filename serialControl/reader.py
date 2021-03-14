@@ -1,13 +1,9 @@
 import serial
+from serial.tools import list_ports
 
 class Controller():
-    def __init__(self, PORT:str="COM8", BAUD_RATE:int=115200):
+    def __init__(self, PORT:str=list_ports.comports()[0].name, BAUD_RATE:int=115200):
         self.ser = serial.Serial(PORT, BAUD_RATE)
-        # self.port = PORT
-        # self.baudRate = BAUD_RATE
-        # self.ser = serial.Serial()
-        # self.ser.port = self.port
-        # self.ser.baudrate = self.baudRate
 
     def readPort(self) -> str:
         if not self.ser.is_open:

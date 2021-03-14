@@ -1,7 +1,7 @@
 from serialControl.reader import Controller
 import paho.mqtt.client as mqtt
 
-serialHandler = Controller("COM7", 115200)
+serialHandler = Controller()
 
 # GLOBALS
 START_TELEMETRY = False
@@ -37,8 +37,8 @@ def on_message(client, userdata, msg):
     global START_TELEMETRY
     message = msg.payload.decode("utf-8")
     topic = msg.topic
-    if DEBUG_MODE:
-        print("Received Message\nTopic: {}\nMessage: {}".format(topic, message))
+    # if DEBUG_MODE:
+    #     print("Received Message:\nTopic: {}\nMessage: {}".format(topic, message))
     telemetryMapping = {
         "ON":True,
         "OFF":False
@@ -92,6 +92,7 @@ while True:
         # print("Got Serial Data: {}".format(readData), end="")
         if START_TELEMETRY:
             readData = serialHandler.readPort()
+            print(readData)
             if "2176" in readData:
                 publish(readData)
     except:
